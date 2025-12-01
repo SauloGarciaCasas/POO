@@ -1,7 +1,7 @@
 from tkinter import *
 
 ventana=Tk()
-ventana.title("text")
+ventana.title("ProgressBar")
 ventana.geometry("500x500")
 
 ventana.mainloop()
