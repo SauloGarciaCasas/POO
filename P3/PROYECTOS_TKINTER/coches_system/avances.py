@@ -32,3 +32,17 @@
     *Interacción con las interfaces
     nombre del commit: "commit_02_12_25"
 """
+"""
+3 de diciembre
+    1) Controlador:
+        3.1 menu_principal()
+        3.2 menu_acciones()
+        3.3 insertar_autos()
+        3.4 consultar_autos()
+        3.5 cambiar_autos()
+        3.6 borrar_autos()
+
+    Productos entregables:
+    *Interacción con la funcionalidad (controlador) de las interfaces anteriores
+    nombre del commit: "commit_03_12_25"
+"""
