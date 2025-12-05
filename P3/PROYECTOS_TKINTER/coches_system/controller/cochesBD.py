@@ -135,3 +135,58 @@ class Camionetas:
         except Exception as e:
             print(f"Error al eliminar Camión: {e}")
             return False
+        
+class Camiones: 
+    @staticmethod
+    def insertar(marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga):
+        try:
+            sql = "INSERT INTO camiones (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
+            val = (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga)
+            cursor.execute(sql, val)
+            conexion.commit()
+            return True
+        except Exception as e:
+            print(f"Error al insertar Camión: {e}")
+            return False
+    
+    @staticmethod
+    def consultar():
+        try:
+            cursor.execute("SELECT * FROM camiones")
+            return cursor.fetchall()
+        except Exception as e:
+            print(f"Error al consultar Camiones: {e}")
+            return []
+
+    @staticmethod
+    def buscar(id):
+        try:
+            # Nota: usamos id_camion según tu SQL
+            cursor.execute("SELECT * FROM camiones WHERE id_camion=%s", (id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al buscar Camión: {e}")
+            return None
+
+    @staticmethod
+    def actualizar(marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga, id):
+        try:
+            sql = "UPDATE camiones SET marca=%s, color=%s, modelo=%s, velocidad=%s, caballaje=%s, plazas=%s, eje=%s, capacidadCarga=%s WHERE id_camion=%s"
+            val = (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga, id)
+            cursor.execute(sql, val)
+            conexion.commit()
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error al actualizar Camión: {e}")
+            return False
+
+    @staticmethod
+    def eliminar(id):
+        try:
+            sql = "DELETE FROM camiones WHERE id_camion=%s"
+            cursor.execute(sql, (id,))
+            conexion.commit() 
+            return cursor.rowcount > 0
+        except Exception as e:
+            print(f"Error al eliminar Camión: {e}")
+            return False

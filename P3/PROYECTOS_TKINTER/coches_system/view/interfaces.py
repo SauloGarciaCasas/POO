@@ -5,7 +5,7 @@ import sys
 import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from controller.cochesBD import Autos, Camionetas
+from controller.cochesBD import Autos, Camionetas, Camiones
 
 class View:
     def __init__(self, ventana):
@@ -386,11 +386,34 @@ class View:
         lbl_titulo.pack(pady=10)
         frame_form = Frame(ventana)
         frame_form.pack(pady=10)
-        campos = ["Marca", "Color", "Modelo", "Velocidad", "Caballaje", "Plazas", "Ejes", "Capacidad Carga"]
-        for i, campo in enumerate(campos):
-            Label(frame_form, text=f"{campo}:").grid(row=i, column=0, padx=5, pady=5, sticky=E)
-            Entry(frame_form, width=30).grid(row=i, column=1, padx=5, pady=5)
-        Button(ventana, text="Guardar Camión", bg="#ccffcc", width=20).pack(pady=15)
+
+        # Campos de entrada
+        txt_marca = Entry(frame_form, width=30)
+        txt_color = Entry(frame_form, width=30)
+        txt_modelo = Entry(frame_form, width=30)
+        txt_velocidad = Entry(frame_form, width=30)
+        txt_caballaje = Entry(frame_form, width=30)
+        txt_plazas = Entry(frame_form, width=30)
+        txt_ejes = Entry(frame_form, width=30)
+        txt_carga = Entry(frame_form, width=30)
+
+        labels = ["Marca:", "Color:", "Modelo:", "Velocidad:", "Caballaje:", "Plazas:", "Ejes:", "Capacidad Carga:"]
+        entries = [txt_marca, txt_color, txt_modelo, txt_velocidad, txt_caballaje, txt_plazas, txt_ejes, txt_carga]
+
+        for i, text in enumerate(labels):
+            Label(frame_form, text=text).grid(row=i, column=0, padx=5, pady=5, sticky=E)
+            entries[i].grid(row=i, column=1, padx=5, pady=5)
+
+        def guardar_camion():
+            if Camiones.insertar(txt_marca.get(), txt_color.get(), txt_modelo.get(), 
+                                 txt_velocidad.get(), txt_caballaje.get(), txt_plazas.get(),
+                                 txt_ejes.get(), txt_carga.get()):
+                messagebox.showinfo("Éxito", "Camión guardado correctamente")
+                View.menu_acciones(ventana, "Camiones")
+            else:
+                messagebox.showerror("Error", "Error al guardar (Verifique datos)")
+
+        Button(ventana, text="Guardar Camión", bg="#ccffcc", width=20, command=guardar_camion).pack(pady=15)
         Button(ventana, text="Volver", width=15, command=lambda: View.menu_acciones(ventana, "Camiones")).pack(pady=5)
 
     @staticmethod
@@ -400,38 +423,87 @@ class View:
         lbl_titulo.pack(pady=10)
         frame_tabla = Frame(ventana)
         frame_tabla.pack(pady=10, padx=20, fill=BOTH, expand=True)
+
         cols = ("ID", "Marca", "Modelo", "Plazas", "Ejes", "Carga")
         tabla = ttk.Treeview(frame_tabla, columns=cols, show='headings')
         for col in cols:
             tabla.heading(col, text=col)
             tabla.column(col, width=90)
+        
+        datos = Camiones.consultar()
+        for row in datos:
+            if len(row) >= 9:
+                valores = (row[0], row[1], row[3], row[6], row[7], row[8])
+                tabla.insert("", END, values=valores)
+            else:
+                tabla.insert("", END, values=row) # Fallback
+
         scrollbar = Scrollbar(frame_tabla, orient=VERTICAL, command=tabla.yview)
         tabla.configure(yscroll=scrollbar.set)
         tabla.pack(side=LEFT, fill=BOTH, expand=True)
         scrollbar.pack(side=RIGHT, fill=Y)
+
         Button(ventana, text="Volver", width=15, command=lambda: View.menu_acciones(ventana, "Camiones")).pack(pady=20)
 
     @staticmethod
     def cambiar_camiones(ventana):
         View.borrarPantalla(ventana)
         Label(ventana, text="Actualizar Camión", font=("Arial", 12, "bold")).pack(pady=10)
+        
         frame_buscar = Frame(ventana)
         frame_buscar.pack(pady=5)
         Label(frame_buscar, text="ID Camión:").pack(side=LEFT, padx=5)
         ent_id = Entry(frame_buscar, width=10)
         ent_id.pack(side=LEFT, padx=5)
+        
         frame_edicion = Frame(ventana)
         frame_edicion.pack(pady=10)
+
         def mostrar_formulario():
             for widget in frame_edicion.winfo_children():
                 widget.destroy()
             
-            if ent_id.get():
-                campos = ["Marca", "Color", "Modelo", "Velocidad", "Caballaje", "Plazas", "Ejes", "Capacidad"]
-                for i, campo in enumerate(campos):
-                    Label(frame_edicion, text=f"Nuevo {campo}:").grid(row=i, column=0, padx=5, pady=5, sticky=E)
-                    Entry(frame_edicion, width=30).grid(row=i, column=1, padx=5, pady=5)
-                Button(frame_edicion, text="Guardar", bg="#ccffcc").grid(row=len(campos), columnspan=2, pady=15)
+            id_buscado = ent_id.get()
+            if not id_buscado:
+                messagebox.showwarning("Atención", "Escriba un ID primero")
+                return
+
+            registro = Camiones.buscar(id_buscado)
+            if not registro:
+                messagebox.showwarning("No encontrado", f"El ID {id_buscado} no existe.")
+                return
+
+            Label(frame_edicion, text=f"Editando ID: {id_buscado}", fg="blue").grid(row=0, columnspan=2, pady=5)
+
+            txt_marca = Entry(frame_edicion, width=30)
+            txt_color = Entry(frame_edicion, width=30)
+            txt_modelo = Entry(frame_edicion, width=30)
+            txt_velocidad = Entry(frame_edicion, width=30)
+            txt_caballaje = Entry(frame_edicion, width=30)
+            txt_plazas = Entry(frame_edicion, width=30)
+            txt_ejes = Entry(frame_edicion, width=30)
+            txt_carga = Entry(frame_edicion, width=30)
+
+            # Pre-llenar
+            campos = [txt_marca, txt_color, txt_modelo, txt_velocidad, txt_caballaje, txt_plazas, txt_ejes, txt_carga]
+            for i, campo in enumerate(campos):
+                campo.insert(0, registro[i+1])
+
+            labels = ["Marca", "Color", "Modelo", "Velocidad", "Caballaje", "Plazas", "Ejes", "Capacidad"]
+            for i, text in enumerate(labels):
+                Label(frame_edicion, text=f"{text}:").grid(row=i+1, column=0, padx=5, pady=5, sticky=E)
+                campos[i].grid(row=i+1, column=1, padx=5, pady=5)
+
+            def ejecutar_actualizacion():
+                if Camiones.actualizar(txt_marca.get(), txt_color.get(), txt_modelo.get(), 
+                                       txt_velocidad.get(), txt_caballaje.get(), txt_plazas.get(),
+                                       txt_ejes.get(), txt_carga.get(), id_buscado):
+                    messagebox.showinfo("Éxito", "Camión actualizado")
+                    View.menu_acciones(ventana, "Camiones")
+                else:
+                    messagebox.showerror("Error", "No se pudo actualizar.")
+
+            Button(frame_edicion, text="Guardar", bg="#ccffcc", command=ejecutar_actualizacion).grid(row=10, columnspan=2, pady=15)
         
         Button(frame_buscar, text="Buscar", command=mostrar_formulario).pack(side=LEFT, padx=5)
         Button(ventana, text="Volver", width=15, command=lambda: View.menu_acciones(ventana, "Camiones")).pack(pady=20)
@@ -441,6 +513,20 @@ class View:
         View.borrarPantalla(ventana)
         Label(ventana, text="Eliminar Camión", font=("Arial", 12, "bold")).pack(pady=20)
         Label(ventana, text="Ingrese ID:").pack(pady=5)
-        Entry(ventana, width=20).pack(pady=5)
-        Button(ventana, text="Eliminar", bg="red", fg="white", width=15).pack(pady=10)
+        txt_id = Entry(ventana, width=20)
+        txt_id.pack(pady=5)
+
+        def ejecutar_borrado():
+            id_a_borrar = txt_id.get()
+            if id_a_borrar:
+                if messagebox.askyesno("Confirmar", "¿Está seguro de eliminar este camión?"):
+                    if Camiones.eliminar(id_a_borrar):
+                        messagebox.showinfo("Eliminado", "Registro eliminado correctamente")
+                        View.menu_acciones(ventana, "Camiones")
+                    else:
+                        messagebox.showwarning("Error", f"No se encontró el ID {id_a_borrar}.")
+            else:
+                messagebox.showwarning("Alerta", "Ingrese un ID")
+
+        Button(ventana, text="Eliminar", bg="red", fg="white", width=25, command=ejecutar_borrado).pack(pady=20)
         Button(ventana, text="Volver", width=15, command=lambda: View.menu_acciones(ventana, "Camiones")).pack(pady=10)
