@@ -3,7 +3,7 @@ import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from conexionBD import *
+from conexionBD import conexion, cursor
 
 class Autos:
     @staticmethod
@@ -28,13 +28,22 @@ class Autos:
             return []
 
     @staticmethod
+    def buscar(id):
+        try:
+            cursor.execute("SELECT * FROM coches WHERE id=%s", (id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al buscar Auto: {e}")
+            return None
+
+    @staticmethod
     def actualizar(marca, color, modelo, velocidad, caballaje, plazas, id):
         try:
             sql = "UPDATE coches SET marca=%s, color=%s, modelo=%s, velocidad=%s, caballaje=%s, plazas=%s WHERE id=%s"
             val = (marca, color, modelo, velocidad, caballaje, plazas, id)
             cursor.execute(sql, val)
             conexion.commit()
-            return True
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al actualizar Auto: {e}")
             return False
@@ -45,7 +54,7 @@ class Autos:
             sql = "DELETE FROM coches WHERE id=%s"
             cursor.execute(sql, (id,))
             conexion.commit()
-            return True
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al eliminar Auto: {e}")
             return False       
@@ -73,13 +82,22 @@ class Camionetas:
             return []
 
     @staticmethod
+    def buscar(id):
+        try:
+            cursor.execute("SELECT * FROM camionetas WHERE id_camionetas=%s", (id,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al buscar Camioneta: {e}")
+            return None
+
+    @staticmethod
     def actualizar(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada, id):
         try:
             sql = "UPDATE camionetas SET marca=%s, color=%s, modelo=%s, velocidad=%s, caballaje=%s, plazas=%s, traccion=%s, cerrada=%s WHERE id_camionetas=%s"
             val = (marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada, id)
             cursor.execute(sql, val)
             conexion.commit()
-            return True
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al actualizar Camioneta: {e}")
             return False
@@ -90,32 +108,10 @@ class Camionetas:
             sql = "DELETE FROM camionetas WHERE id_camionetas=%s"
             cursor.execute(sql, (id,))
             conexion.commit()
-            return True  
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al eliminar Camioneta: {e}")
             return False  
-
-class Camiones: 
-    @staticmethod
-    def insertar(marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga):
-        try:
-            sql = "INSERT INTO camiones (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"
-            val = (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga)
-            cursor.execute(sql, val)
-            conexion.commit()
-            return True
-        except Exception as e:
-            print(f"Error al insertar Camión: {e}")
-            return False
-    
-    @staticmethod
-    def consultar():
-        try:
-            cursor.execute("SELECT * FROM camiones")
-            return cursor.fetchall()
-        except Exception as e:
-            print(f"Error al consultar Camiones: {e}")
-            return []
 
     @staticmethod
     def actualizar(marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga, id):
@@ -124,7 +120,7 @@ class Camiones:
             val = (marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga, id)
             cursor.execute(sql, val)
             conexion.commit()
-            return True
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al actualizar Camión: {e}")
             return False
@@ -135,7 +131,7 @@ class Camiones:
             sql = "DELETE FROM camiones WHERE id_camion=%s"
             cursor.execute(sql, (id,))
             conexion.commit() 
-            return True  
+            return cursor.rowcount > 0
         except Exception as e:
             print(f"Error al eliminar Camión: {e}")
             return False

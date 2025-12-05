@@ -46,3 +46,27 @@
     *Interacción con la funcionalidad (controlador) de las interfaces anteriores
     nombre del commit: "commit_03_12_25"
 """
+"""
+4 de diciembre
+    1) Controlador:
+        3.3 insertar_camionetas()
+        3.4 consultar_camionetas()
+        3.5 cambiar_camionetas()
+        3.6 borrar_camionetas()
+
+    Productos entregables:
+    *Interacción con la funcionalidad (controlador) de las interfaces anteriores
+    nombre del commit: "commit_04_12_25"
+"""
+"""
+5 de diciembre
+    1) Controlador:
+        3.3 insertar_camiones()
+        3.4 consultar_camiones()
+        3.5 cambiar_camiones()
+        3.6 borrar_camiones()
+
+    Productos entregables:
+    *Interacción con la funcionalidad (controlador) de las interfaces anteriores
+    nombre del commit: "commit_05_12_25"
+"""
